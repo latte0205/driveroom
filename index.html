@@ -119,9 +119,12 @@
   .cloud.c2 { top: 52%; width: 190px; opacity: .7; animation-duration: 34s; animation-delay: -22s; }
   @keyframes drift { from { transform: translateX(-220px); } to { transform: translateX(560px); } }
   .flight { position: absolute; left: 0; top: 0; width: 100%; height: 100%; animation: fly 14s linear infinite; }
-  .plane, .shadow { position: absolute; width: 40px; transform: rotate(62deg); }
+  .plane, .shadow { position: absolute; width: 13px; transform: rotate(62deg); }
+  .flame { transform-origin: 20px 186px; animation: flicker .12s ease-in-out infinite alternate; }
+  .shadow .flame { display: none; }
+  @keyframes flicker { from { transform: scaleY(.8); } to { transform: scaleY(1.15); } }
   .plane { left: 0; top: 0; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
-  .shadow { left: 26px; top: 36px; width: 34px; filter: brightness(0) blur(2px); opacity: .3; }
+  .shadow { left: 30px; top: 30px; width: 12px; filter: brightness(0) blur(2px); opacity: .3; }
   @keyframes fly {
     from { transform: translate(-60px, 150px); }
     to { transform: translate(calc(100% + 40px), -60px); }
@@ -327,13 +330,21 @@ const sub = it => it.sub ? `<span class="sub">${it.subIcon === "play" ? PLAY : P
 const more = `<span class="more">${DOTS}</span>`;
 // Official Google Maps embed (keyless "Share > Embed a map" form)
 const embed = geo => `https://maps.google.com/maps?q=${geo}&z=16&hl=zh-TW&output=embed`;
-const PLANE = `<svg viewBox="0 0 64 64"><g fill="#fff" stroke="#6b7686" stroke-width="1.6" stroke-linejoin="round">
-  <path d="M32 4c2.2 0 3.4 2.4 3.4 6v13l20 12v5l-20-6v11l6 5v4l-9.4-2.6L22.6 54v-4l6-5V34l-20 6v-5l20-12V10c0-3.6 1.2-6 3.4-6z"/></g>
-  <path d="M30.2 9h3.6v4.5h-3.6z" fill="#4a8fd6"/><path d="M8.6 35l20-12M55.4 35l-20-12" stroke="#d64a4a" stroke-width="1.6" fill="none"/></svg>`;
+// Starship-style two-stage stainless rocket (generic, no logos)
+const ROCKET = `<svg viewBox="0 0 40 220"><defs><linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#7d8790"/><stop offset=".45" stop-color="#f3f5f7"/><stop offset=".6" stop-color="#dfe3e7"/><stop offset="1" stop-color="#6f7881"/></linearGradient></defs>
+  <g class="flame"><path d="M11 186c0 14 4 26 9 34 5-8 9-20 9-34z" fill="#ff8a1f"/><path d="M14 186c0 9 3 16 6 21 3-5 6-12 6-21z" fill="#fff3b0"/><path d="M17 186c0 5 1.5 8 3 10 1.5-2 3-5 3-10z" fill="#9fd4ff"/></g>
+  <path d="M10 104h20v80H10z" fill="url(#steel)" stroke="#5c646c" stroke-width=".8"/>
+  <path d="M11 184h18v3H11z" fill="#3a3f45"/>
+  <path d="M5 110h5v6H5zM30 110h5v6h-5z" fill="#3a3f45"/>
+  <path d="M10 99h20v5H10z" fill="#3a3f45"/>
+  <path d="M20 2C27 10 30 22 30 34v65H10V34C10 22 13 10 20 2z" fill="url(#steel)" stroke="#5c646c" stroke-width=".8"/>
+  <path d="M10 26l-5 6v10l5-3zM30 26l5 6v10l-5-3z" fill="#2f3439"/>
+  <path d="M10 78l-6 6v15h6zM30 78l6 6v15h-6z" fill="#2f3439"/>
+  <path d="M10 60h20M10 140h20M10 160h20" stroke="#9aa3ad" stroke-width=".6"/></svg>`;
 const CLOUD = `<svg viewBox="0 0 120 60"><path fill="#fff" d="M28 52C14 52 6 44 6 35s8-16 18-16c3-9 11-15 21-15 11 0 19 7 21 17 2-1 5-2 8-2 10 0 17 7 17 15 9 1 16 7 16 15 0 2 0 3-1 3H28z"/></svg>`;
 const sky = `<div class="sky" aria-hidden="true">
   <span class="cloud c1">${CLOUD}</span><span class="cloud c2">${CLOUD}</span>
-  <span class="flight"><span class="shadow">${PLANE}</span><span class="plane">${PLANE}</span></span>
+  <span class="flight"><span class="shadow">${ROCKET}</span><span class="plane">${ROCKET}</span></span>
 </div>`;
 
 function render(it, gi, ii) {
