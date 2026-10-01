@@ -110,12 +110,29 @@
     background: var(--btn-bg); border-radius: 16px; padding: 14px 14px 12px;
     box-shadow: 0 4px 4px rgba(0,0,0,.12);
   }
-  .featured img { width: 100%; display: block; aspect-ratio: 374/212; object-fit: cover; }
+    .mapbox { position: relative; aspect-ratio: 374/212; overflow: hidden; border-radius: 8px; background: #e8e4da; }
+  .mapbox iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .sky { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+  .cloud { position: absolute; width: 150px; opacity: .85; filter: blur(3px) drop-shadow(0 6px 8px rgba(60,70,90,.35)); animation: drift 26s linear infinite; }
+  .cloud svg, .flight svg { display: block; width: 100%; height: auto; }
+  .cloud.c1 { top: 4%; animation-delay: -6s; }
+  .cloud.c2 { top: 52%; width: 190px; opacity: .7; animation-duration: 34s; animation-delay: -22s; }
+  @keyframes drift { from { transform: translateX(-220px); } to { transform: translateX(560px); } }
+  .flight { position: absolute; left: 0; top: 0; width: 100%; height: 100%; animation: fly 14s linear infinite; }
+  .plane, .shadow { position: absolute; width: 40px; transform: rotate(62deg); }
+  .plane { left: 0; top: 0; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  .shadow { left: 26px; top: 36px; width: 34px; filter: brightness(0) blur(2px); opacity: .3; }
+  @keyframes fly {
+    from { transform: translate(-60px, 150px); }
+    to { transform: translate(calc(100% + 40px), -60px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .cloud, .flight { animation: none; } .flight { transform: translate(62%, 30%); } }
+  .featured:hover { transform: none; }
   .featured .t { margin-top: 10px; font-size: 14px; font-weight: 500; }
   .featured .sub { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; opacity: .65; }
   .featured .sub svg { width: 12px; height: 12px; fill: currentColor; }
   .featured .dir {
-    display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 10px;
+    display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 10px; color: inherit; text-decoration: none;
     background: rgba(50,90,70,.15); font-size: 13px; font-weight: 500;
   }
   .featured .more { position: absolute; right: 8px; bottom: 28px; width: 40px; height: 40px; display: grid; place-items: center; opacity: .55; }
@@ -145,7 +162,7 @@
     font-size: 20px; line-height: 1; cursor: pointer; color: #1e2330;
   }
   .sheet p { white-space: pre-line; font-size: 15px; line-height: 1.6; }
-  .sheet img { width: 100%; border-radius: 12px; display: block; margin-bottom: 12px; }
+  .sheet iframe { width: 100%; aspect-ratio: 374/212; border: 0; border-radius: 12px; display: block; margin-bottom: 12px; }
   .sheet .pill {
     display: block; margin-top: 20px; padding: 14px; text-align: center; border-radius: 12px;
     background: #1e2330; color: #fff; font-weight: 600; font-size: 15px; text-decoration: none;
@@ -194,7 +211,7 @@
       <h2 id="modal-title"></h2>
       <button class="close" type="button" aria-label="關閉">×</button>
     </div>
-    <img id="modal-img" alt="" hidden>
+    <iframe id="modal-map" title="Google Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" hidden></iframe>
     <p id="modal-body"></p>
     <a class="pill" id="modal-btn" target="_blank" rel="noopener"></a>
   </div>
@@ -285,15 +302,15 @@ const GROUPS = [
     { kind: "link", title: "LINE Official @070penmc", url: "https://lin.ee/ndentaD", icon: "outline-brand-wechat" },
   ]},
   { title: "Parking Information 停車資訊", items: [
-    { kind: "map", title: "京王地下停車場 (限高1.8m)", url: "https://maps.app.goo.gl/DpjzVq2sh4ppNs748?g_st=ic", icon: "outline-parking-circle", map: "assets/map-keio.png", sub: "B2, No. 1號, Alley 8, Lane 188, Minan Rd", subIcon: "pin",
+    { kind: "map", title: "京王地下停車場 (限高1.8m)", url: "https://maps.app.goo.gl/DpjzVq2sh4ppNs748?g_st=ic", icon: "outline-parking-circle", geo: "25.0238778,121.4243518", sub: "B2, No. 1號, Alley 8, Lane 188, Minan Rd", subIcon: "pin",
       name: "京王停車場 - 臨停平面，月租機械 Line ID：＠648iQina", addr: "B2, No. 1號, Alley 8, Lane 188, Minan Rd, Xinzhuang District, New Taipei City, Taiwan 242" },
-    { kind: "map", title: "四維立體停車場 (限高1.55m)", url: "https://maps.app.goo.gl/T3aDrwdyyxqxtoQ78?g_st=ic", icon: "filled-parking-circle", map: "assets/map-siwei.png", sub: "No. 95, Siwei Rd", subIcon: "pin",
+    { kind: "map", title: "四維立體停車場 (限高1.55m)", url: "https://maps.app.goo.gl/T3aDrwdyyxqxtoQ78?g_st=ic", icon: "filled-parking-circle", geo: "25.0238594,121.4235", sub: "No. 95, Siwei Rd", subIcon: "pin",
       name: "Siwei Liti Parking", addr: "No. 95, Siwei Rd, Xinzhuang District, New Taipei City, Taiwan 242" },
-    { kind: "map", title: "後港新公園地下停車場 (限高1.8m)", url: "https://maps.app.goo.gl/rEge5ujJT9Un2msy7?g_st=ic", icon: "outline-parking", map: "assets/map-hougang.png", sub: "B2, No. 19號, Hougang 1st Rd", subIcon: "pin",
+    { kind: "map", title: "後港新公園地下停車場 (限高1.8m)", url: "https://maps.app.goo.gl/rEge5ujJT9Un2msy7?g_st=ic", icon: "outline-parking", geo: "25.0260716,121.4240119", sub: "B2, No. 19號, Hougang 1st Rd", subIcon: "pin",
       name: "後港新公園地下停車場", addr: "B2, No. 19號, Hougang 1st Rd, Xinzhuang District, New Taipei City, Taiwan 242" },
   ]},
   { title: "開球室 Google Map 導航", items: [
-    { kind: "featured-map", title: "新北市新莊區四維路25號1樓", url: "https://maps.app.goo.gl/mP4RcRMqecTqsoNq6?g_st=il", map: "assets/map-venue.png", sub: "Siwei Rd" },
+    { kind: "featured-map", title: "新北市新莊區四維路25號1樓", url: "https://maps.app.goo.gl/mP4RcRMqecTqsoNq6?g_st=il", geo: "25.02244,121.422819", sub: "Siwei Rd" },
   ]},
 ];
 
@@ -308,6 +325,16 @@ const thumb = it => it.img
   : it.icon ? `<span class="thumb"><span class="icon">${ICONS[it.icon]}</span></span>` : "";
 const sub = it => it.sub ? `<span class="sub">${it.subIcon === "play" ? PLAY : PIN}${esc(it.sub)}</span>` : "";
 const more = `<span class="more">${DOTS}</span>`;
+// Official Google Maps embed (keyless "Share > Embed a map" form)
+const embed = geo => `https://maps.google.com/maps?q=${geo}&z=16&hl=zh-TW&output=embed`;
+const PLANE = `<svg viewBox="0 0 64 64"><g fill="#fff" stroke="#6b7686" stroke-width="1.6" stroke-linejoin="round">
+  <path d="M32 4c2.2 0 3.4 2.4 3.4 6v13l20 12v5l-20-6v11l6 5v4l-9.4-2.6L22.6 54v-4l6-5V34l-20 6v-5l20-12V10c0-3.6 1.2-6 3.4-6z"/></g>
+  <path d="M30.2 9h3.6v4.5h-3.6z" fill="#4a8fd6"/><path d="M8.6 35l20-12M55.4 35l-20-12" stroke="#d64a4a" stroke-width="1.6" fill="none"/></svg>`;
+const CLOUD = `<svg viewBox="0 0 120 60"><path fill="#fff" d="M28 52C14 52 6 44 6 35s8-16 18-16c3-9 11-15 21-15 11 0 19 7 21 17 2-1 5-2 8-2 10 0 17 7 17 15 9 1 16 7 16 15 0 2 0 3-1 3H28z"/></svg>`;
+const sky = `<div class="sky" aria-hidden="true">
+  <span class="cloud c1">${CLOUD}</span><span class="cloud c2">${CLOUD}</span>
+  <span class="flight"><span class="shadow">${PLANE}</span><span class="plane">${PLANE}</span></span>
+</div>`;
 
 function render(it, gi, ii) {
   const id = `${gi}-${ii}`;
@@ -318,7 +345,7 @@ function render(it, gi, ii) {
     case "map":
       return `<button class="btn" type="button" data-open="${id}">${thumb(it)}<span>${esc(it.title)}</span>${sub(it)}${more}</button>`;
     case "featured-map":
-      return `<a class="featured" href="${esc(it.url)}" target="_blank" rel="noopener"><img src="${it.map}" alt="${esc(it.title)}"><div class="t">${esc(it.title)}</div><div class="sub">${PIN}${esc(it.sub)}</div><div><span class="dir">Get directions</span></div>${more}</a>`;
+      return `<div class="featured"><div class="mapbox"><iframe src="${embed(it.geo)}" title="${esc(it.title)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>${sky}</div><div class="t">${esc(it.title)}</div><div class="sub">${PIN}${esc(it.sub)}</div><div><a class="dir" href="${esc(it.url)}" target="_blank" rel="noopener">Get directions</a></div>${more}</div>`;
   }
 }
 
@@ -331,15 +358,15 @@ document.getElementById("links").innerHTML = GROUPS.map((g, gi) => `
 // Notice / map modal
 const modal = document.getElementById("modal");
 const mBtn = document.getElementById("modal-btn");
-const mImg = document.getElementById("modal-img");
+const mMap = document.getElementById("modal-map");
 document.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => {
   const [gi, ii] = b.dataset.open.split("-").map(Number);
   const it = GROUPS[gi].items[ii];
   document.getElementById("modal-title").textContent = it.title;
   const isMap = it.kind === "map";
   document.getElementById("modal-body").textContent = isMap ? `${it.name}\n${it.addr}` : it.body;
-  mImg.hidden = !isMap;
-  if (isMap) mImg.src = it.map;
+  mMap.hidden = !isMap;
+  mMap.src = isMap ? embed(it.geo) : "about:blank";
   const btnTitle = isMap ? "Get directions" : it.btnTitle;
   const btnUrl = isMap ? it.url : it.btnUrl;
   mBtn.textContent = btnTitle;
