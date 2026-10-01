@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@driveroom.ft | 開球室</title>
+<meta name="description" content="開球室 | 24hr室內高爾夫球模擬器 | 24/7 Self-serving Golf Simulator">
+<link rel="icon" href="assets/avatar.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #5A2832;
+    --page: #54323a;
+    --fg: #EBF5E1;
+    --btn-bg: #EBF5E1;
+    --btn-fg: #325A46;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", sans-serif;
+    color: var(--fg); background: var(--page); -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    position: relative; max-width: 580px; min-height: 100vh; margin: 0 auto; overflow: hidden;
+    background:
+      radial-gradient(ellipse 90% 45% at 50% 42%, rgba(255,255,255,.07), transparent 70%),
+      radial-gradient(ellipse 90% 40% at 50% 85%, rgba(255,255,255,.05), transparent 70%),
+      var(--bg);
+  }
+  .page::before { /* subtle grain */
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .18; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  @media (min-width: 640px) {
+    .page { margin-top: 33px; border-radius: 32px 32px 0 0; min-height: calc(100vh - 33px); }
+  }
+  .hero { position: relative; height: 186px; }
+  .hero video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .corner {
+    position: absolute; top: 12px; width: 40px; height: 40px; border-radius: 12px; border: 0;
+    display: grid; place-items: center; background: rgba(36,52,34,.85); color: #fff; cursor: pointer;
+  }
+  .corner svg { width: 20px; height: 20px; }
+  .corner.left { left: 12px; } .corner.right { right: 12px; }
+  @media (min-width: 640px) { .corner { top: 28px; left: auto; } .corner.left { left: 28px; } .corner.right { right: 28px; } }
+
+  main { position: relative; padding: 0 14px 120px; display: flex; flex-direction: column; align-items: center; }
+  @media (min-width: 640px) { main { padding: 0 28px 48px; } }
+  .avatar {
+    width: 100px; height: 100px; margin-top: -50px; border-radius: 50%; overflow: hidden;
+    border: 2px solid rgba(255,255,255,.4);
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  h1 { margin-top: 18px; font-size: 24px; font-weight: 700; line-height: 1.3; text-align: center; }
+  .bio { margin-top: 6px; font-size: 16px; line-height: 1.5; text-align: center; padding: 0 24px; }
+
+  .links { width: 100%; margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .group { display: flex; flex-direction: column; gap: 16px; }
+  .group-title { margin: 8px 0 -4px; font-size: 14px; font-weight: 700; text-align: center; line-height: 1.5; }
+  .group:first-child .group-title { margin-top: 0; }
+  @media (min-width: 640px) { .group-title { font-size: 16px; } }
+
+  .btn {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 100%; min-height: 64px; padding: 8px 64px;
+    background: var(--btn-bg); color: var(--btn-fg);
+    border: 0; border-radius: 16px; box-shadow: 0 4px 4px rgba(0,0,0,.12);
+    font: inherit; font-size: 14px; font-weight: 400; line-height: 1.4; text-align: center;
+    text-decoration: none; cursor: pointer; transition: transform .15s ease;
+  }
+  @media (min-width: 640px) { .btn { font-size: 16px; } }
+  .btn:hover { transform: scale(1.02); }
+  .btn .sub { display: flex; align-items: center; gap: 3px; font-size: 12px; opacity: .65; margin-top: 1px; }
+  .btn .sub svg { width: 12px; height: 12px; fill: currentColor; flex: none; }
+  .btn .thumb {
+    position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; display: grid; place-items: center; border-radius: 8px; overflow: hidden;
+  }
+  .btn .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .btn .thumb .icon { width: 32px; height: 32px; color: var(--btn-fg); }
+  .btn .thumb .icon svg { width: 100%; height: 100%; display: block; }
+  .btn .more {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; display: grid; place-items: center; opacity: .55;
+  }
+  .btn .more svg { width: 16px; height: 16px; }
+
+  @keyframes buzz {
+    0% { transform: translateX(3px) rotate(1deg); }
+    2.5% { transform: translateX(-3px) rotate(-1deg); }
+    5% { transform: translateX(3px) rotate(1deg); }
+    7.5% { transform: translateX(-3px) rotate(-1deg); }
+    10% { transform: translateX(2px) rotate(1deg); }
+    12.5% { transform: translateX(-2px) rotate(-1deg); }
+    15% { transform: translateX(2px) rotate(1deg); }
+    17.5% { transform: translateX(-2px) rotate(-1deg); }
+    20% { transform: translateX(1px) rotate(1deg); }
+    22.5% { transform: translateX(-1px) rotate(-1deg); }
+    25%, 100% { transform: translateX(0) rotate(0); }
+  }
+  .buzz { animation: buzz 3s linear infinite; }
+  .buzz:active { animation: none; }
+  @media (prefers-reduced-motion: reduce) { .buzz { animation: none; } }
+
+  /* Featured map card */
+  .featured {
+    position: relative; display: block; text-decoration: none; color: var(--btn-fg); text-align: center;
+    background: var(--btn-bg); border-radius: 16px; padding: 14px 14px 12px;
+    box-shadow: 0 4px 4px rgba(0,0,0,.12);
+  }
+  .featured img { width: 100%; display: block; aspect-ratio: 374/212; object-fit: cover; }
+  .featured .t { margin-top: 10px; font-size: 14px; font-weight: 500; }
+  .featured .sub { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; opacity: .65; }
+  .featured .sub svg { width: 12px; height: 12px; fill: currentColor; }
+  .featured .dir {
+    display: inline-block; margin-top: 8px; padding: 6px 12px; border-radius: 10px;
+    background: rgba(50,90,70,.15); font-size: 13px; font-weight: 500;
+  }
+  .featured .more { position: absolute; right: 8px; bottom: 28px; width: 40px; height: 40px; display: grid; place-items: center; opacity: .55; }
+  .featured .more svg { width: 16px; height: 16px; }
+
+  .socials { display: flex; gap: 12px; margin-top: 32px; }
+  .socials a { color: var(--fg); display: grid; place-items: center; width: 40px; height: 40px; }
+  .socials svg { width: 28px; height: 28px; }
+
+  /* Modal */
+  .modal {
+    position: fixed; inset: 0; z-index: 10; display: none; align-items: flex-end; justify-content: center;
+    background: rgba(0,0,0,.55);
+  }
+  .modal.open { display: flex; }
+  .sheet {
+    width: 100%; max-width: 580px; max-height: 88vh; overflow: auto;
+    background: #fff; color: #1e2330; border-radius: 24px 24px 0 0; padding: 20px 20px 28px;
+    animation: up .22s ease;
+  }
+  @media (min-width: 640px) { .modal { align-items: center; } .sheet { border-radius: 24px; } }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .sheet-head h2 { font-size: 17px; font-weight: 700; }
+  .close {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #f1f1f3;
+    font-size: 20px; line-height: 1; cursor: pointer; color: #1e2330;
+  }
+  .sheet p { white-space: pre-line; font-size: 15px; line-height: 1.6; }
+  .sheet img { width: 100%; border-radius: 12px; display: block; margin-bottom: 12px; }
+  .sheet .pill {
+    display: block; margin-top: 20px; padding: 14px; text-align: center; border-radius: 12px;
+    background: #1e2330; color: #fff; font-weight: 600; font-size: 15px; text-decoration: none;
+  }
+  .sheet .pill.disabled { opacity: .5; pointer-events: none; }
+  .toast {
+    position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); z-index: 20;
+    background: #1e2330; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px;
+    opacity: 0; transition: opacity .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <video src="assets/banner.mp4" autoplay muted loop playsinline poster=""></video>
+    <a class="corner left" href="#" aria-label="DRiVE ROOM" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg>
+    </a>
+    <button class="corner right" type="button" id="share" aria-label="分享">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M8 11H6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-2"/></svg>
+    </button>
+  </div>
+  <main>
+    <div class="avatar"><img src="assets/avatar.jpeg" alt="@driveroom.ft"></div>
+    <h1>@driveroom.ft</h1>
+    <p class="bio">開球室 | 24hr室內高爾夫球模擬器 | 24/7 Self-serving Golf Simulator</p>
+
+    <div class="links" id="links"></div>
+
+    <nav class="socials" aria-label="Social links">
+      <a href="https://instagram.com/driveroom.ft" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg>
+      </a>
+      <a href="https://www.threads.com/@driveroom.ft" target="_blank" rel="noopener" aria-label="Threads">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.7 11.1l-.3-.1c-.2-3.2-1.9-5-4.8-5h-.1c-1.7 0-3.2.7-4.1 2.1l1.6 1.1c.7-1 1.7-1.3 2.5-1.3h.1c1 0 1.7.3 2.2.9.4.4.6 1 .7 1.8-.8-.1-1.7-.2-2.7-.1-2.7.2-4.4 1.700-4.3 3.9.1 1.1.6 2.1 1.6 2.7.8.5 1.9.8 3 .7 1.5-.1 2.6-.6 3.4-1.7.6-.8 1-1.8 1.2-3.1.7.4 1.2 1 1.5 1.6.5 1.1.5 2.9-1 4.4-1.3 1.3-2.9 1.9-5.300 1.9-2.7 0-4.7-.9-6-2.6C5.6 17.6 5 15.3 4.9 12c0-3.3.7-5.6 2-7.2C8.2 3.2 10.2 2.3 12.9 2.3c2.7 0 4.8.9 6.2 2.6.7.8 1.2 1.9 1.6 3.1l1.9-.5c-.4-1.5-1.1-2.8-2-3.9C18.8 1.4 16.2.3 12.9.3h-.1C9.5.3 7 1.4 5.3 3.5 3.8 5.4 3 8.1 3 11.5v.1c0 3.4.8 6.1 2.3 8 1.7 2.1 4.2 3.2 7.5 3.2h.1c2.9 0 5-.8 6.7-2.5 2.3-2.3 2.2-5.1 1.4-6.8-.5-1.2-1.6-2.2-3.3-2.4zm-5 4.7c-1.2.1-2.5-.5-2.5-1.6 0-.8.6-1.8 2.6-1.9h.7c.7 0 1.4.1 2 .2-.2 2.9-1.6 3.2-2.8 3.300z"/></svg>
+      </a>
+    </nav>
+  </main>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="modal-title"></h2>
+      <button class="close" type="button" aria-label="關閉">×</button>
+    </div>
+    <img id="modal-img" alt="" hidden>
+    <p id="modal-body"></p>
+    <a class="pill" id="modal-btn" target="_blank" rel="noopener"></a>
+  </div>
+</div>
+<div class="toast" id="toast">已複製連結</div>
+
+<script>
+const LINE_CS = "https://lin.ee/xaEWwH8";
+
+const NOTICE_GOLFJOY = `１｜本場使用GolfJoy模擬器，可直接使用「訪客模式」擊球。
+
+２｜建議註冊／登入GolfJoy帳號，解鎖更多球場，還可查看擊球紀錄。
+
+３｜登入GolfJoy帳號步驟：
+開啟 GolfJoy Space APP=>點選右上角掃碼圖示=>掃描螢幕/投影幕上顯示的QR Code=>完成登入。
+
+1 | This facility uses the GolfJoy simulator. You can start playing immediately using Guest Mode.
+
+2 | We recommend creating or logging into a GolfJoy account to unlock more golf courses and view your shot history and performance records.
+
+3 | How to log in to your GolfJoy account:
+
+* Open the GolfJoy Space App
+* Tap the QR Scanner icon in the top-right corner
+* Scan the QR code displayed on the simulator screen/projector
+* Login complete
+
+Enjoy your session at DRiVE ROOM.`;
+
+const NOTICE_RESERVE = `１｜在預約完成網頁，點選「綁定LINE」，系統會自動通知預約資訊，更方便到場時出示門禁條碼。
+
+２｜預定時間前10分鐘，可提前入場。請在大門左側感應器掃讀門禁QR code(距離約10-15公分)，即可「拉」門進入。
+
+３｜進入後請開啟休息區燈光、空調設備(遙控器請對準走廊上方的綠色溫度顯示器)。
+
+４｜模擬器請選擇「訪客模式」或「登入您的GolfJoy帳號」，開始擊球。
+
+１｜ After completing your booking, tap “Connect to LINE” on the confirmation page to receive booking updates and access your entry QR code.
+
+２｜ You may enter up to 10 minutes before your booking time. Scan your entry QR code at the reader on the left side of the entrance door, then pull the door open.
+
+３｜ Turn on the lights, air conditioning, and your reserved simulator system. • Point the A/C remote toward the green temperature display above the hallway. • Press the power button on the side of the touchscreen unit, marked with a small arrow sticker.
+
+４｜ Select Guest Mode or sign in with your GolfJoy account to begin.
+
+Thank you for respecting the space.
+Enjoy your session at DRiVE ROOM.`;
+
+const NOTICE_EXIT = `1｜預約時段結束後，相關設備將自動關閉，請於 10 分鐘內離場；如需延長使用，請提前至預訂系統加訂時段。
+
+2｜請將冷氣遙控器及公用球具等物品歸位。
+
+3｜飲料請整理清潔丟棄至垃圾桶/回收桶，如有廚餘或油膩垃圾請帶離本場，讓每位使用者都能享有舒適乾淨的空間體驗。
+
+4｜離開前，請別忘了您的個人物品與球具，並請協助關閉「休息區」與「廁所」電燈。
+
+5｜請確實關上玻璃大門，確認上鎖後再行離開。
+
+1｜ At the end of your booking, the simulator system will shut down automatically. Please leave within 10 minutes. To extend your session, please book additional time before your reservation ends.
+
+2｜ Please return all shared items, including the air conditioning remote, projector remote, and golf clubs, to their designated locations.
+
+3｜ Please take all trash and drinks with you when leaving to help keep DRiVE ROOM clean and welcoming for every guest.
+
+4｜ Before leaving, please check that you have all your clubs and personal belongings, and help turn off the lounge and restroom lights.
+
+5｜ Please ensure the glass entrance door is fully closed and locked before you leave.
+
+Thank you for respecting the space.`;
+
+// kind: link | notice (opens modal) | map (expands inline) | featured-map
+const GROUPS = [
+  { title: "Venue Guildlines 場館說明", items: [
+    { kind: "link", title: "入場流程 ROOM GUiDE （First-timer👆🏼）", url: "https://youtube.com/shorts/NNJKDzUQoHY?si=vJnRBKUrkzat39Si", img: "assets/guide-thumb.avif" },
+    { kind: "notice", title: "預約須知 Reserve Notice", icon: "outline-door-enter", body: NOTICE_RESERVE, btnTitle: "DRiVE ROOM LINE客服", btnUrl: LINE_CS },
+    { kind: "notice", title: "離場須知 Exiting Notice", icon: "outline-door-exit", body: NOTICE_EXIT, btnTitle: "DRiVE ROOM LINE客服", btnUrl: LINE_CS },
+  ]},
+  { title: "Reservation Links 預約連結", items: [
+    { kind: "link", buzz: true, title: "The Room | 雙打道空間", url: "https://golfbook.tw/driveyoke/driveyoke.html?640397011916045620", icon: "outline-golf" },
+    { kind: "link", title: "Standard Bay | No.1 標準打道", url: "https://golfbook.tw/driveyoke/driveyoke.html?640395011916038291", icon: "outline-circle-number-1" },
+    { kind: "link", title: "Flex Bay | No.2 寬敞打道", url: "https://golfbook.tw/driveyoke/driveyoke.html?640396011916048437", icon: "filled-circle-number-2" },
+  ]},
+  { title: "Golfjoy Space App 模擬器", items: [
+    { kind: "notice", title: "GolfJoy模擬器說明 GolfSim Login Guide", icon: "outline-book", body: NOTICE_GOLFJOY, btnTitle: "Apple iPhone 蘋果手機下載連結（App Store）", btnUrl: "" },
+    { kind: "link", title: "Golfjoy Space App 下載連結🔗", url: "https://play.google.com/store/apps/details?id=cn.golfonline.golfjoy_space2_app&hl=en", icon: "outline-brand-appstore", sub: "Google Play", subIcon: "play" },
+  ]},
+  { title: "官方客服聯繫窗口", items: [
+    { kind: "link", title: "LINE Official @070penmc", url: "https://lin.ee/ndentaD", icon: "outline-brand-wechat" },
+  ]},
+  { title: "Parking Information 停車資訊", items: [
+    { kind: "map", title: "京王地下停車場 (限高1.8m)", url: "https://maps.app.goo.gl/DpjzVq2sh4ppNs748?g_st=ic", icon: "outline-parking-circle", map: "assets/map-keio.png", sub: "B2, No. 1號, Alley 8, Lane 188, Minan Rd", subIcon: "pin",
+      name: "京王停車場 - 臨停平面，月租機械 Line ID：＠648iQina", addr: "B2, No. 1號, Alley 8, Lane 188, Minan Rd, Xinzhuang District, New Taipei City, Taiwan 242" },
+    { kind: "map", title: "四維立體停車場 (限高1.55m)", url: "https://maps.app.goo.gl/T3aDrwdyyxqxtoQ78?g_st=ic", icon: "filled-parking-circle", map: "assets/map-siwei.png", sub: "No. 95, Siwei Rd", subIcon: "pin",
+      name: "Siwei Liti Parking", addr: "No. 95, Siwei Rd, Xinzhuang District, New Taipei City, Taiwan 242" },
+    { kind: "map", title: "後港新公園地下停車場 (限高1.8m)", url: "https://maps.app.goo.gl/rEge5ujJT9Un2msy7?g_st=ic", icon: "outline-parking", map: "assets/map-hougang.png", sub: "B2, No. 19號, Hougang 1st Rd", subIcon: "pin",
+      name: "後港新公園地下停車場", addr: "B2, No. 19號, Hougang 1st Rd, Xinzhuang District, New Taipei City, Taiwan 242" },
+  ]},
+  { title: "開球室 Google Map 導航", items: [
+    { kind: "featured-map", title: "新北市新莊區四維路25號1樓", url: "https://maps.app.goo.gl/mP4RcRMqecTqsoNq6?g_st=il", map: "assets/map-venue.png", sub: "Siwei Rd" },
+  ]},
+];
+
+const ICONS = {"filled-circle-number-2": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" ><path d=\"M12 2c5.523 0 10 4.477 10 10s-4.477 10 -10 10s-10 -4.477 -10 -10s4.477 -10 10 -10zm1 5h-3l-.117 .007a1 1 0 0 0 0 1.986l.117 .007h3v2h-2l-.15 .005a2 2 0 0 0 -1.844 1.838l-.006 .157v2l.005 .15a2 2 0 0 0 1.838 1.844l.157 .006h3l.117 -.007a1 1 0 0 0 0 -1.986l-.117 -.007h-3v-2h2l.15 -.005a2 2 0 0 0 1.844 -1.838l.006 -.157v-2l-.005 -.15a2 2 0 0 0 -1.838 -1.844l-.157 -.006z\" /></svg>", "filled-parking-circle": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" ><path d=\"M12 2c5.523 0 10 4.477 10 10a10 10 0 0 1 -20 0l.004 -.28c.148 -5.393 4.566 -9.72 9.996 -9.72m1.334 5h-3.334a1 1 0 0 0 -1 1v8a1 1 0 0 0 1 1l.117 -.007a1 1 0 0 0 .883 -.993v-3h2.334c1.516 0 2.666 -1.38 2.666 -3s-1.15 -3 -2.666 -3m0 2c.323 0 .666 .411 .666 1s-.343 1 -.666 1h-2.334v-2z\" /></svg>", "outline-book": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0\" /><path d=\"M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0\" /><path d=\"M3 6l0 13\" /><path d=\"M12 6l0 13\" /><path d=\"M21 6l0 13\" /></svg>", "outline-brand-appstore": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\" /><path d=\"M8 16l1.106 -1.99m1.4 -2.522l2.494 -4.488\" /><path d=\"M7 14h5m2.9 0h2.1\" /><path d=\"M16 16l-2.51 -4.518m-1.487 -2.677l-1 -1.805\" /></svg>", "outline-brand-wechat": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M16.5 10c3.038 0 5.5 2.015 5.5 4.5c0 1.397 -.778 2.645 -2 3.47l0 2.03l-1.964 -1.178a6.649 6.649 0 0 1 -1.536 .178c-3.038 0 -5.5 -2.015 -5.5 -4.5s2.462 -4.5 5.5 -4.5z\" /><path d=\"M11.197 15.698c-.69 .196 -1.43 .302 -2.197 .302a8.008 8.008 0 0 1 -2.612 -.432l-2.388 1.432v-2.801c-1.237 -1.082 -2 -2.564 -2 -4.199c0 -3.314 3.134 -6 7 -6c3.782 0 6.863 2.57 7 5.785l0 .233\" /><path d=\"M10 8h.01\" /><path d=\"M7 8h.01\" /><path d=\"M15 14h.01\" /><path d=\"M18 14h.01\" /></svg>", "outline-circle-number-1": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\" /><path d=\"M10 10l2 -2v8\" /></svg>", "outline-door-enter": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M13 12v.01\" /><path d=\"M3 21h18\" /><path d=\"M5 21v-16a2 2 0 0 1 2 -2h6m4 10.5v7.5\" /><path d=\"M21 7h-7m3 -3l-3 3l3 3\" /></svg>", "outline-door-exit": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M13 12v.01\" /><path d=\"M3 21h18\" /><path d=\"M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5\" /><path d=\"M14 7h7m-3 -3l3 3l-3 3\" /></svg>", "outline-golf": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 18v-15l7 4l-7 4\" /><path d=\"M9 17.67c-.62 .36 -1 .82 -1 1.33c0 1.1 1.8 2 4 2s4 -.9 4 -2c0 -.5 -.38 -.97 -1 -1.33\" /></svg>", "outline-parking-circle": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M10 16v-8h3.334c.92 0 1.666 .895 1.666 2s-.746 2 -1.666 2h-3.334\" /><path d=\"M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0\" /></svg>", "outline-parking": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z\" /><path d=\"M10 16v-8h2.667c.736 0 1.333 .895 1.333 2s-.597 2 -1.333 2h-2.667\" /></svg>"};
+const DOTS = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+const PIN = '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
+const PLAY = '<svg viewBox="0 0 24 24"><path d="M4 2.5v19a1 1 0 0 0 1.5.9L21 13a1.2 1.2 0 0 0 0-2L5.5 1.6A1 1 0 0 0 4 2.5z"/></svg>';
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const thumb = it => it.img
+  ? `<span class="thumb"><img src="${it.img}" alt=""></span>`
+  : it.icon ? `<span class="thumb"><span class="icon">${ICONS[it.icon]}</span></span>` : "";
+const sub = it => it.sub ? `<span class="sub">${it.subIcon === "play" ? PLAY : PIN}${esc(it.sub)}</span>` : "";
+const more = `<span class="more">${DOTS}</span>`;
+
+function render(it, gi, ii) {
+  const id = `${gi}-${ii}`;
+  switch (it.kind) {
+    case "link":
+      return `<a class="btn${it.buzz ? " buzz" : ""}" href="${esc(it.url)}" target="_blank" rel="noopener">${thumb(it)}<span>${esc(it.title)}</span>${sub(it)}${more}</a>`;
+    case "notice":
+    case "map":
+      return `<button class="btn" type="button" data-open="${id}">${thumb(it)}<span>${esc(it.title)}</span>${sub(it)}${more}</button>`;
+    case "featured-map":
+      return `<a class="featured" href="${esc(it.url)}" target="_blank" rel="noopener"><img src="${it.map}" alt="${esc(it.title)}"><div class="t">${esc(it.title)}</div><div class="sub">${PIN}${esc(it.sub)}</div><div><span class="dir">Get directions</span></div>${more}</a>`;
+  }
+}
+
+document.getElementById("links").innerHTML = GROUPS.map((g, gi) => `
+  <section class="group">
+    <h2 class="group-title">${esc(g.title)}</h2>
+    ${g.items.map((it, ii) => render(it, gi, ii)).join("")}
+  </section>`).join("");
+
+// Notice / map modal
+const modal = document.getElementById("modal");
+const mBtn = document.getElementById("modal-btn");
+const mImg = document.getElementById("modal-img");
+document.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => {
+  const [gi, ii] = b.dataset.open.split("-").map(Number);
+  const it = GROUPS[gi].items[ii];
+  document.getElementById("modal-title").textContent = it.title;
+  const isMap = it.kind === "map";
+  document.getElementById("modal-body").textContent = isMap ? `${it.name}\n${it.addr}` : it.body;
+  mImg.hidden = !isMap;
+  if (isMap) mImg.src = it.map;
+  const btnTitle = isMap ? "Get directions" : it.btnTitle;
+  const btnUrl = isMap ? it.url : it.btnUrl;
+  mBtn.textContent = btnTitle;
+  if (btnUrl) { mBtn.href = btnUrl; mBtn.classList.remove("disabled"); }
+  else { mBtn.removeAttribute("href"); mBtn.classList.add("disabled"); }
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";
+}));
+
+// Share
+document.getElementById("share").addEventListener("click", async () => {
+  const data = { title: "@driveroom.ft", url: location.href };
+  try {
+    if (navigator.share) return await navigator.share(data);
+    await navigator.clipboard.writeText(location.href);
+    const t = document.getElementById("toast");
+    t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1600);
+  } catch (e) {}
+});
+const closeModal = () => { modal.classList.remove("open"); document.body.style.overflow = ""; };
+modal.querySelector(".close").addEventListener("click", closeModal);
+modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+</script>
+</body>
+</html>
